@@ -1,7 +1,5 @@
 module Clockwork
-
   module DatabaseEvents
-
     class Event < Clockwork::Event
 
       attr_accessor :sync_performer, :at
@@ -20,19 +18,22 @@ module Clockwork
         name
       end
 
-      def name_or_frequency_has_changed?(model)
-        name_has_changed?(model) || frequency_has_changed?(model)
+      def changed?(model)
+        name_changed?(model) || frequency_changed?(model) || at_changed?(model)
       end
 
       private
-      def name_has_changed?(model)
+      def at_changed?(model)
+        @at != At.parse(model.at)
+      end
+
+      def name_changed?(model)
         job.respond_to?(:name) && job.name != model.name
       end
 
-      def frequency_has_changed?(model)
+      def frequency_changed?(model)
         @period != model.frequency
       end
     end
-
   end
 end

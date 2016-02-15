@@ -40,7 +40,7 @@ module Clockwork
 
         @model_class.all.each do |model|
           model_ids_that_exist << model.id
-          if are_different?(@database_event_registry.event_for(model), model)
+          if changed?(@database_event_registry.event_for(model), model)
             create_or_recreate_event(model)
           end
         end
@@ -48,24 +48,9 @@ module Clockwork
       end
 
       private
-      def are_different?(event, model)
+      def changed?(event, model)
         return true if event.nil?
-        event.name_or_frequency_has_changed?(model) || ats_have_changed?(model)
-      end
-
-      def ats_have_changed?(model)
-        model_ats = ats_array_for_event(model)
-        event_ats = ats_array_from_model(model)
-
-        model_ats != event_ats
-      end
-
-      def ats_array_for_event(model)
-        @database_event_registry.events_for(model).collect{|event| event.at }.compact
-      end
-
-      def ats_array_from_model(model)
-        (at_strings_for(model) || []).collect{|at| At.parse(at) }
+        event.changed?(model) #|| ats_have_changed?(model)
       end
 
       def at_strings_for(model)
