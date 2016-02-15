@@ -50,7 +50,7 @@ module Clockwork
       private
       def changed?(event, model)
         return true if event.nil?
-        event.changed?(model) #|| ats_have_changed?(model)
+        event.changed?(model)
       end
 
       def at_strings_for(model)
